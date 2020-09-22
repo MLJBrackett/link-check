@@ -1,5 +1,8 @@
+import requests
+import re
 import argparse
 import sys
+from colorama import init, Fore, Back, Style
 
 parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
 parser.add_argument('-v',"--version", action='store_true', help="returns version of tool")
@@ -29,15 +32,15 @@ def urlcheck():
             for currentUrl in url:
                 try:
                     r = requests.head(currentUrl,timeout=1.5,allow_redirects=True)
-                    print(currentUrl,r.status_code)
+                    print(Fore.GREEN+currentUrl,r.status_code)
                 except requests.exceptions.RequestException:
                     print(Fore.RED+currentUrl,"DEAD LINK")
         else:
             try:
                 r = requests.head(url[0],timeout=1.5,allow_redirects=True)
-                print(url[0],r.status_code)
+                print(Fore.GREEN+url[0],r.status_code)
             except requests.exceptions.RequestException:
-                print(url[0],"DEAD LINK")
+                print(Fore.RED+url[0],"DEAD LINK")
     print(Style.RESET_ALL)
 
 
