@@ -39,3 +39,9 @@ def urlcheck():
             except requests.exceptions.RequestException:
                 print(url[0],"DEAD LINK")
     print(Style.RESET_ALL)
+
+
+if args.version:
+    print(version)
+if args.file:
+    urlparse()
