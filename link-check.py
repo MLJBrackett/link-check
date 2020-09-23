@@ -34,7 +34,7 @@ def urlParse():
                 foundUrls.append(urls)
         urlCheck()
 
-# Returns the status code of the given URLs
+# Returns the status code of the given URLs & prints corresponding message
 def urlCheck():
     for url in foundUrls:
             try:
