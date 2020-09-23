@@ -43,23 +43,23 @@ def urlCheck():
             for currentUrl in url:
                 try:
                     r = requests.head(currentUrl,timeout=1.5)
-                    if r.status_code >= 200:
+                    if r.status_code in range(200,299):
                         print(Fore.GREEN + currentUrl,r.status_code,' GOOD')
-                    elif r.status_code == 404 | 400:
-                        print(Fore.RED + currentUrl,r.status_code,' DEAD')
+                    elif r.status_code in range (400,599):
+                        print(Fore.RED + currentUrl,r.status_code,' CLIENT/SERVER ISSUE')
                     else:
-                        print(Fore.YELLOW + currentUrl,r.status_code,' OKAY')
+                        print(Fore.YELLOW + currentUrl,r.status_code,' REDIRECT')
                 except requests.exceptions.RequestException:
                     print(Fore.RED + currentUrl,"TIMEOUT")
         else:
             try:
                 r = requests.head(url[0],timeout=1.5)
-                if r.status_code == 200:
+                if r.status_code in range(200,299):
                     print(Fore.GREEN+url[0],r.status_code,' GOOD')
-                elif r.status_code == 404 | 400:
-                    print(Fore.RED + url[0],r.status_code,' DEAD')
+                elif r.status_code in range(400,599):
+                    print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
                 else:
-                    print(Fore.YELLOW + url[0],r.status_code,' OKAY')
+                    print(Fore.YELLOW + url[0],r.status_code,' REDIRECT')
             except requests.exceptions.RequestException:
                 print(Fore.RED + url[0],"TIMEOUT")
     print(Style.RESET_ALL)
@@ -70,10 +70,10 @@ def urlCheckRedirect():
             for currentUrl in url:
                 try:
                     r = requests.head(currentUrl,timeout=1.5,allow_redirects=True)
-                    if r.status_code == 200:
+                    if r.status_code in range(200,299):
                         print(Fore.GREEN + currentUrl,r.status_code,' GOOD')
-                    elif r.status_code == 404 | 400:
-                        print(Fore.RED + currentUrl,r.status_code,' DEAD')
+                    elif r.status_code in range(400,599):
+                        print(Fore.RED + currentUrl,r.status_code,' CLIENT/SERVER ISSUE')
                     else:
                         print(Fore.YELLOW + currentUrl,r.status_code,' OKAY')
                 except requests.exceptions.RequestException:
@@ -81,10 +81,10 @@ def urlCheckRedirect():
         else:
             try:
                 r = requests.head(url[0],timeout=1.5,allow_redirects=True)
-                if r.status_code == 200:
+                if r.status_code in range(200,299):
                     print(Fore.GREEN + url[0],r.status_code,' GOOD')
-                elif r.status_code == 404 | 400:
-                    print(Fore.RED + url[0],r.status_code,' DEAD')
+                elif r.status_code in range(400,599):
+                    print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
                 else:
                     print(Fore.YELLOW + url[0],r.status_code,' OKAY')
             except requests.exceptions.RequestException:
