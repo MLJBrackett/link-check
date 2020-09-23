@@ -4,6 +4,8 @@ import argparse
 import sys
 from colorama import init, Fore, Back, Style
 
+init(convert=True)
+
 parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
 parser.add_argument('-v',"--version", action='store_true', help="returns version of tool")
 parser.add_argument('-f','--file',help="parses file", metavar='\b')
