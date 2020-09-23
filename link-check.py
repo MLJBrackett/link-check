@@ -19,7 +19,6 @@ if len(sys.argv)==1:
     parser.print_help(sys.stderr)
     sys.exit(1)
 
-
 def urlparse():
     with open(args.file) as file:
         for line in file:
@@ -45,7 +44,6 @@ def urlcheck():
         else:
             try:
                 r = requests.head(url[0],timeout=2.5,allow_redirects=True)
-                
                 if r.status_code==200:
                     print(Fore.GREEN+url[0],r.status_code,' GOOD')
                 elif r.status_code==404:
@@ -55,7 +53,6 @@ def urlcheck():
             except requests.exceptions.RequestException:
                 print(Fore.RED+url[0],"TIMEOUT")
     print(Style.RESET_ALL)
-
 
 if args.version:
     print(version)
