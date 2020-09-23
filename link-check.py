@@ -4,7 +4,7 @@ import argparse
 import sys
 from colorama import init, Fore, Back, Style
 
-init(convert=True)
+init()
 
 parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
 parser.add_argument('-v',"--version", action='store_true', help="Returns the current version of tool")
@@ -35,7 +35,7 @@ def urlcheck():
                     r = requests.head(currentUrl,timeout=2.5,allow_redirects=True)
                     if r.status_code==200:
                         print(Fore.GREEN+currentUrl,r.status_code,' GOOD')
-                    elif r.status_code==404:
+                    elif r.status_code==404 | 400:
                         print(Fore.RED+currentUrl,r.status_code,' DEAD')
                     else:
                         print(Fore.YELLOW+currentUrl,r.status_code,' OKAY')
