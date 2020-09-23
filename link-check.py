@@ -3,58 +3,97 @@ import re
 import argparse
 import sys
 from colorama import init, Fore, Back, Style
-
 init()
 
 parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
 parser.add_argument('-v',"--version", action='store_true', help="Returns the current version of tool")
 parser.add_argument('-f','--file',help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
+parser.add_argument('-r','--redirect',help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
 
-args=parser.parse_args()
+args = parser.parse_args()
 
-version=0.1
-properUrls=[]
+version = 0.1
+foundUrls = []
 
-if len(sys.argv)==1:
+if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     sys.exit(1)
 
-def urlparse():
-    with open(args.file) as file:
-        for line in file:
-            urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-            if len(urls) != 0:
-                properUrls.append(urls)
-    urlcheck()
+def urlParse():
+    if args.file:
+        with open(args.file) as file:
+            for line in file:
+                urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+                if len(urls) != 0:
+                    foundUrls.append(urls)
+            urlCheck()
 
-def urlcheck():
-    for url in properUrls:
+    if args.redirect:
+        with open(args.redirect) as file:
+            for line in file:
+                urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+                if len(urls) != 0:
+                    foundUrls.append(urls)
+            urlCheckRedirect()
+        
+
+def urlCheck():
+    for url in foundUrls:
         if len(url) > 1:
             for currentUrl in url:
                 try:
-                    r = requests.head(currentUrl,timeout=2.5,allow_redirects=True)
-                    if r.status_code==200:
-                        print(Fore.GREEN+currentUrl,r.status_code,' GOOD')
-                    elif r.status_code==404 | 400:
-                        print(Fore.RED+currentUrl,r.status_code,' DEAD')
+                    r = requests.head(currentUrl,timeout=1.5)
+                    if r.status_code >= 200:
+                        print(Fore.GREEN + currentUrl,r.status_code,' GOOD')
+                    elif r.status_code == 404 | 400:
+                        print(Fore.RED + currentUrl,r.status_code,' DEAD')
                     else:
-                        print(Fore.YELLOW+currentUrl,r.status_code,' OKAY')
+                        print(Fore.YELLOW + currentUrl,r.status_code,' OKAY')
                 except requests.exceptions.RequestException:
-                    print(Fore.RED+currentUrl,"TIMEOUT")
+                    print(Fore.RED + currentUrl,"TIMEOUT")
         else:
             try:
-                r = requests.head(url[0],timeout=2.5,allow_redirects=True)
-                if r.status_code==200:
+                r = requests.head(url[0],timeout=1.5)
+                if r.status_code == 200:
                     print(Fore.GREEN+url[0],r.status_code,' GOOD')
-                elif r.status_code==404:
-                    print(Fore.RED+url[0],r.status_code,' DEAD')
+                elif r.status_code == 404 | 400:
+                    print(Fore.RED + url[0],r.status_code,' DEAD')
                 else:
-                    print(Fore.YELLOW+url[0],r.status_code,' OKAY')
+                    print(Fore.YELLOW + url[0],r.status_code,' OKAY')
             except requests.exceptions.RequestException:
-                print(Fore.RED+url[0],"TIMEOUT")
+                print(Fore.RED + url[0],"TIMEOUT")
+    print(Style.RESET_ALL)
+
+def urlCheckRedirect():
+    for url in foundUrls:
+        if len(url) > 1:
+            for currentUrl in url:
+                try:
+                    r = requests.head(currentUrl,timeout=1.5,allow_redirects=True)
+                    if r.status_code == 200:
+                        print(Fore.GREEN + currentUrl,r.status_code,' GOOD')
+                    elif r.status_code == 404 | 400:
+                        print(Fore.RED + currentUrl,r.status_code,' DEAD')
+                    else:
+                        print(Fore.YELLOW + currentUrl,r.status_code,' OKAY')
+                except requests.exceptions.RequestException:
+                    print(Fore.RED + currentUrl,"TIMEOUT")
+        else:
+            try:
+                r = requests.head(url[0],timeout=1.5,allow_redirects=True)
+                if r.status_code == 200:
+                    print(Fore.GREEN + url[0],r.status_code,' GOOD')
+                elif r.status_code == 404 | 400:
+                    print(Fore.RED + url[0],r.status_code,' DEAD')
+                else:
+                    print(Fore.YELLOW + url[0],r.status_code,' OKAY')
+            except requests.exceptions.RequestException:
+                print(Fore.RED + url[0],"TIMEOUT")
     print(Style.RESET_ALL)
 
 if args.version:
     print(version)
-if args.file:
-    urlparse()
+elif args.file:
+    urlParse()
+elif args.redirect:
+    urlParse()
