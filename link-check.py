@@ -31,16 +31,27 @@ def urlcheck():
         if len(url) > 1:
             for currentUrl in url:
                 try:
-                    r = requests.head(currentUrl,timeout=1.5,allow_redirects=True)
-                    print(Fore.GREEN+currentUrl,r.status_code)
+                    r = requests.head(currentUrl,timeout=2.5,allow_redirects=True)
+                    if r.status_code==200:
+                        print(Fore.GREEN+currentUrl,r.status_code,' GOOD')
+                    elif r.status_code==404:
+                        print(Fore.RED+currentUrl,r.status_code,' DEAD')
+                    else:
+                        print(Fore.YELLOW+currentUrl,r.status_code,' OKAY')
                 except requests.exceptions.RequestException:
-                    print(Fore.RED+currentUrl,"DEAD LINK")
+                    print(Fore.RED+currentUrl,"TIMEOUT")
         else:
             try:
-                r = requests.head(url[0],timeout=1.5,allow_redirects=True)
-                print(Fore.GREEN+url[0],r.status_code)
+                r = requests.head(url[0],timeout=2.5,allow_redirects=True)
+                
+                if r.status_code==200:
+                    print(Fore.GREEN+url[0],r.status_code,' GOOD')
+                elif r.status_code==404:
+                    print(Fore.RED+url[0],r.status_code,' DEAD')
+                else:
+                    print(Fore.YELLOW+url[0],r.status_code,' OKAY')
             except requests.exceptions.RequestException:
-                print(Fore.RED+url[0],"DEAD LINK")
+                print(Fore.RED+url[0],"TIMEOUT")
     print(Style.RESET_ALL)
 
 
