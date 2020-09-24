@@ -27,16 +27,16 @@ pip install -r requirements.txt
 
 Use the -h/--help flags to see arguements
 ```bash
-python link-check -h
+python link-check.py -h
 ```
 Check URLs **without** redirect support
 ```bash
-python link-check -f links.txt
+python link-check.py -f links.txt
 ```
 Check URLs **with** redirect support
 
 ```bash
-python link-check -r links.txt
+python link-check.py -r links.txt
 ```
 ## Contributing
 Contributions are welcomed, if you think you have a good idea or see an improvement that you can make, create an issue or submit a pull request.
