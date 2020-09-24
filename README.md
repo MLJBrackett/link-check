@@ -25,6 +25,8 @@ pip install -r requirements.txt
 
 ## Usage
 
+**For the program to run with a file you must either use the -f or -r flag**
+
 Use the -h/--help flags to see arguements
 ```bash
 python link-check.py -h
