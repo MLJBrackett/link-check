@@ -55,6 +55,6 @@ def urlCheck():
     print(Style.RESET_ALL)
 
 if args.version:
-    print(version)
+    print(Fore.GREEN+"Link"+Fore.RED+" Check",Style.RESET_ALL,"v.",version)
 elif args.file or args.redirect:
     urlParse()
