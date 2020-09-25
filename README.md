@@ -2,7 +2,7 @@
 
 Link Check is a Python program for finding good/dead links in any file type.
 
-![Link Check](https://i.imgur.com/NQogvnF.gif)
+![Link Check](https://i.gyazo.com/4e7e46ca83fc24950ad70194ab222b63.gif)
 
 ## Getting Started
 
