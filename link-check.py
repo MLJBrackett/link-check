@@ -6,16 +6,11 @@ from colorama import init, Fore, Back, Style
 
 init()  # Colour support for Windows operating systems
 
-parser = argparse.ArgumentParser(
-    description="link-check is a broken link identifier")
-parser.add_argument('-v', "--version", action='store_true',
-                    help="Returns the current version of tool")
-parser.add_argument(
-    '-f', '--file', help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
-parser.add_argument('-r', '--redirect',
-                    help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
-parser.add_argument(
-    '-j', '--json', help="Prints all urls in a json object on the command line", nargs='*', metavar="")
+parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
+parser.add_argument('-v', "--version", action='store_true', help="Returns the current version of tool")
+parser.add_argument('-f', '--file', help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
+parser.add_argument('-r', '--redirect', help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
+parser.add_argument('-j', '--json', help="Prints all urls in a json object on the command line", nargs='*', metavar="")
 
 args = parser.parse_args()
 
@@ -27,8 +22,6 @@ if len(sys.argv) == 1:
     sys.exit(1)
 
 # Parses the URL from the given file
-
-
 def urlParse():
     if args.file:
         argFile = args.file
@@ -43,8 +36,6 @@ def urlParse():
         urlCheck()
 
 # Returns the status code of the given URLs & prints corresponding message
-
-
 def urlCheck():
     for url in foundUrls:
         try:
@@ -62,8 +53,7 @@ def urlCheck():
                 if r.status_code in range(200, 299):
                     print(Fore.GREEN + url[0], r.status_code, ' GOOD')
                 elif r.status_code in range(400, 599):
-                    print(Fore.RED + url[0], r.status_code,
-                          ' CLIENT/SERVER ISSUE')
+                    print(Fore.RED + url[0], r.status_code,' CLIENT/SERVER ISSUE')
                 elif r.status_code in range(300, 399):
                     print(Fore.YELLOW + url[0], r.status_code, ' REDIRECT')
                 else:
@@ -71,7 +61,6 @@ def urlCheck():
         except requests.exceptions.RequestException:
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
-
 
 if args.version:
     print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
