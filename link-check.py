@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description="link-check is a broken link identi
 parser.add_argument('-v',"--version", action='store_true', help="Returns the current version of tool")
 parser.add_argument('-f','--file',help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
 parser.add_argument('-r','--redirect',help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
-parser.add_argument('-j','--json',help="Prints all urls in a json object on the command line",nargs='*', metavar="")
+parser.add_argument('-j','--json', nargs='*')
 
 args = parser.parse_args()
 
