@@ -11,9 +11,9 @@ parser.add_argument('-v',"--version", action='store_true', help="Returns the cur
 parser.add_argument('-f','--file',help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
 parser.add_argument('-r','--redirect',help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
 parser.add_argument('-j','--json', nargs='*')
-parser.add_argument('-a','--all', nargs='*')
-parser.add_argument('-g','--good', nargs='*')
-parser.add_argument('-b','--bad', nargs='*')
+parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)", metavar='\b',nargs='*')
+parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)", metavar='\b',nargs='*')
+
 args = parser.parse_args()
 
 version = 0.2
