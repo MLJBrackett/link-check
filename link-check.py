@@ -16,7 +16,7 @@ parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)"
 
 args = parser.parse_args()
 
-version = 0.1
+version = 0.2
 foundUrls = []
 
 # If no arguements print help
