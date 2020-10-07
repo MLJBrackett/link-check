@@ -10,7 +10,6 @@ parser = argparse.ArgumentParser(description="link-check is a broken link identi
 parser.add_argument('-v',"--version", action='store_true', help="Returns the current version of tool")
 parser.add_argument('-f','--file',help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
 parser.add_argument('-r','--redirect',help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
-parser.add_argument('-j','--json', nargs='*')
 parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)",nargs='*',metavar='')
 parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)",nargs='*',metavar='')
 
@@ -44,35 +43,21 @@ def urlCheck():
                     r = requests.head(url[0],timeout=1.5)
                 elif args.redirect:
                     r = requests.head(url[0],timeout=1.5,allow_redirects=True)
-                if args.json is not None:
-                    jsonObj = {
-                        "url": url,
-                        "status": r.status_code
-                    }
-                    if args.good is not None:
-                        if r.status_code in range(200,299):
-                            jsonArr.append(jsonObj)
-                    elif args.bad is not None:
-                        if r.status_code in range(400,599):
-                            jsonArr.append(jsonObj)
-                    else:
-                        jsonArr.append(jsonObj)
+                if args.good is not None:
+                    if r.status_code in range(200,299):
+                        print(Fore.GREEN + url[0],r.status_code,' GOOD')
+                elif args.bad is not None:
+                    if r.status_code in range(400,599):
+                        print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
                 else:
-                    if args.good is not None:
-                        if r.status_code in range(200,299):
-                            print(Fore.GREEN + url[0],r.status_code,' GOOD')
-                    elif args.bad is not None:
-                        if r.status_code in range(400,599):
-                            print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
+                    if r.status_code in range(200,299):
+                        print(Fore.GREEN + url[0],r.status_code,' GOOD')
+                    elif r.status_code in range(400,599):
+                        print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
+                    elif r.status_code in range(300,399):
+                        print(Fore.YELLOW + url[0],r.status_code,' REDIRECT')
                     else:
-                        if r.status_code in range(200,299):
-                            print(Fore.GREEN + url[0],r.status_code,' GOOD')
-                        elif r.status_code in range(400,599):
-                            print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
-                        elif r.status_code in range(300,399):
-                            print(Fore.YELLOW + url[0],r.status_code,' REDIRECT')
-                        else:
-                            print(Fore.WHITE + url[0],r.status_code,' UNKNOWN')
+                        print(Fore.WHITE + url[0],r.status_code,' UNKNOWN')
             except requests.exceptions.RequestException:
                 print(Fore.RED + url[0],"TIMEOUT")
     print(Style.RESET_ALL)
@@ -81,10 +66,4 @@ if args.version:
     print(Fore.GREEN+"Link"+Fore.RED+" Check",Style.RESET_ALL,"v.",version)
 elif args.file or args.redirect:
     foundUrls = []
-    if args.json is not None:
-        jsonArr = []
-        print(Fore.YELLOW,' ** JSON Object creation is slow ** \n',Fore.GREEN,'** JSON Object being created... **',Style.RESET_ALL)
-        urlParse()
-        print(jsonArr)
-    else: 
-        urlParse()
+    urlParse()
