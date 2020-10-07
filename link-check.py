@@ -47,11 +47,18 @@ def urlCheck():
             elif args.redirect:
                 r = requests.head(url[0], timeout=1.5, allow_redirects=True)
             if args.json is not None:
-                jsonObj = {
-                    "url": url,
-                    "status": r.status_code
-                }
-                jsonArr.append(jsonObj)
+                    jsonObj = {
+                        "url": url,
+                        "status": r.status_code
+                    }
+                    if args.good is not None:
+                        if r.status_code in range(200,299):
+                            jsonArr.append(jsonObj)
+                    elif args.bad is not None:
+                        if r.status_code in range(400,599):
+                            jsonArr.append(jsonObj)
+                    else:
+                        jsonArr.append(jsonObj)
             else:
                 if args.good is not None:
                     if r.status_code in range(200,299):
