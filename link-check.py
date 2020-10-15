@@ -13,6 +13,7 @@ parser.add_argument('-r', '--redirect', help="Checks the given file in the curre
 parser.add_argument('-j', '--json', help="Prints all urls in a json object on the command line", nargs='*', metavar="")
 parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)",nargs='*',metavar='')
 parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)",nargs='*',metavar='')
+parser.add_argument('-i','--ignore', help="Supply a text file with urls to ignore checking in the given file",metavar='')
 
 args = parser.parse_args()
 
@@ -35,7 +36,11 @@ def urlParse():
             urls = re.findall(
                 r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
             if len(urls) != 0:
-                foundUrls.append(urls)
+                if args.ignore:
+                    if not ignoreURL(urls):
+                        foundUrls.append(urls)
+                else:
+                    foundUrls.append(urls)
         urlCheck()
 
 # Returns the status code of the given URLs & prints corresponding message
@@ -78,6 +83,19 @@ def urlCheck():
         except requests.exceptions.RequestException:
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
+
+def ignoreURL(url):
+    ignore = False
+    ignoreFile = args.ignore
+    with open(ignoreFile) or open(ignoreFile) as file:
+        for line in file:
+            if re.match('#', line):
+                pass
+            elif re.match(r'http[s]?://', line):
+                if re.search(f'({line}.*$)', str(url)):
+                    ignore = True
+    return ignore
+            
 
 if args.version:
     print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
