@@ -13,6 +13,7 @@ parser.add_argument('-r', '--redirect', help="Checks the given file in the curre
 parser.add_argument('-j', '--json', help="Prints all urls in a json object on the command line", nargs='*', metavar="")
 parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)",nargs='*',metavar='')
 parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)",nargs='*',metavar='')
+parser.add_argument('-i','--ignore', help="Supply a text file with urls to ignore checking in the given file",metavar='')
 
 args = parser.parse_args()
 
@@ -30,13 +31,20 @@ def urlParse():
         argFile = args.file
     elif args.redirect:
         argFile = args.redirect
-    with open(argFile) or open(argFile) as file:
-        for line in file:
-            urls = re.findall(
-                r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-            if len(urls) != 0:
-                foundUrls.append(urls)
-        urlCheck()
+    try:
+        with open(argFile) or open(argFile) as file:
+            for line in file:
+                urls = re.findall(
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+                if len(urls) != 0:
+                    if args.ignore:
+                        if not ignoreURL(urls):
+                            foundUrls.append(urls)
+                    else:
+                        foundUrls.append(urls)
+    except Exception as e:
+        print(f'\n{e}')
+    urlCheck()
 
 # Returns the status code of the given URLs & prints corresponding message
 def urlCheck():
@@ -78,6 +86,28 @@ def urlCheck():
         except requests.exceptions.RequestException:
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
+
+# Returns true if url is in the ignore list.
+def ignoreURL(url):
+    ignore = False
+    ignoreFile = args.ignore
+    try:
+        with open(ignoreFile) or open(ignoreFile) as file:
+            toIgnore = re.findall(r'^http[s]?://.*[^\s/]', file.read(), re.M)
+            file.seek(0)
+            for line in file:
+                if re.match('#', line) or re.match('\n', line):
+                    pass
+                elif re.match(r'^http[s]?://', line):
+                    for domain in toIgnore: 
+                        if re.match(f'{domain}', url[0]):    
+                            ignore = True
+                else:
+                    raise ValueError('\nInvalid file format for --ignore. Lines must start with "#", "http://", or "https://" only.')
+    except FileNotFoundError as e:             
+        raise
+    return ignore
+            
 
 if args.version:
     print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
