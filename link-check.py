@@ -87,21 +87,13 @@ def urlCheck():
 def ignoreURL(url):
     ignore = False
     ignoreFile = args.ignore
-    try:
-        with open(ignoreFile) or open(ignoreFile) as file:
-            toIgnore = re.findall(r'^http[s]?://.*[^\s/]', file.read(), re.M)
-            file.seek(0)
-            for line in file:
-                if re.match('#', line):
-                    pass
-                elif re.match(r'^http[s]?://', line):
-                    for ig in toIgnore: 
-                        if re.match(f'{ig}', url[0]):    
-                            ignore = True
-                #else:
-                    #raise ValueError('Invalid file format. Lines must start with "#", "http://", or "https://" only.')
-    except FileNotFoundError as e:                
-        print(e)
+    with open(ignoreFile) or open(ignoreFile) as file:
+        for line in file:
+            if re.match('#', line):
+                pass
+            elif re.match(r'http[s]?://', line):
+                if re.search(f'({line}.*$)', str(url)):
+                    ignore = True
     return ignore
             
 
