@@ -31,20 +31,17 @@ def urlParse():
         argFile = args.file
     elif args.redirect:
         argFile = args.redirect
-    try:
-        with open(argFile) or open(argFile) as file:
-            for line in file:
-                urls = re.findall(
-                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
-                if len(urls) != 0:
-                    if args.ignore:
-                        if not ignoreURL(urls):
-                            foundUrls.append(urls)
-                    else:
+    with open(argFile) or open(argFile) as file:
+        for line in file:
+            urls = re.findall(
+                r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+            if len(urls) != 0:
+                if args.ignore:
+                    if not ignoreURL(urls):
                         foundUrls.append(urls)
-    except Exception as e:
-        print(f'\n{e}')
-    urlCheck()
+                else:
+                    foundUrls.append(urls)
+        urlCheck()
 
 # Returns the status code of the given URLs & prints corresponding message
 def urlCheck():
@@ -87,7 +84,6 @@ def urlCheck():
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
 
-# Returns true if url is in the ignore list.
 def ignoreURL(url):
     ignore = False
     ignoreFile = args.ignore
@@ -96,16 +92,16 @@ def ignoreURL(url):
             toIgnore = re.findall(r'^http[s]?://.*[^\s/]', file.read(), re.M)
             file.seek(0)
             for line in file:
-                if re.match('#', line) or re.match('\n', line):
+                if re.match('#', line):
                     pass
                 elif re.match(r'^http[s]?://', line):
-                    for domain in toIgnore: 
-                        if re.match(f'{domain}', url[0]):    
+                    for ig in toIgnore: 
+                        if re.match(f'{ig}', url[0]):    
                             ignore = True
-                else:
-                    raise ValueError('\nInvalid file format for --ignore. Lines must start with "#", "http://", or "https://" only.')
-    except FileNotFoundError as e:             
-        raise
+                #else:
+                    #raise ValueError('Invalid file format. Lines must start with "#", "http://", or "https://" only.')
+    except FileNotFoundError as e:                
+        print(e)
     return ignore
             
 
