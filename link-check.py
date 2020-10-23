@@ -17,9 +17,6 @@ parser.add_argument('-i','--ignore', help="Supply a text file with urls to ignor
 
 args = parser.parse_args()
 
-version = 0.2
-foundUrls = []
-
 # If no arguements print help
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
@@ -27,6 +24,7 @@ if len(sys.argv) == 1:
 
 # Parses the URL from the given file
 def urlParse():
+    foundUrls = []
     if args.file:
         argFile = args.file
     elif args.redirect:
@@ -44,10 +42,10 @@ def urlParse():
                         foundUrls.append(urls)
     except Exception as e:
         print(f'\n{e}')
-    urlCheck()
+    urlCheck(foundUrls)
 
 # Returns the status code of the given URLs & prints corresponding message
-def urlCheck():
+def urlCheck(foundUrls):
     for url in foundUrls:
         try:
             if args.file:
@@ -70,19 +68,19 @@ def urlCheck():
             else:
                 if args.good is not None:
                     if r.status_code in range(200,299):
-                        print(Fore.GREEN + url[0],r.status_code,' GOOD')
+                        print(Fore.GREEN, url[0],r.status_code,' GOOD')
                 elif args.bad is not None:
                     if r.status_code in range(400,599):
-                        print(Fore.RED + url[0],r.status_code,' CLIENT/SERVER ISSUE')
+                        print(Fore.RED, url[0],r.status_code,' CLIENT/SERVER ISSUE')
                 else:
                     if r.status_code in range(200, 299):
-                        print(Fore.GREEN + url[0], r.status_code, ' GOOD')
+                        print(Fore.GREEN, url[0], r.status_code, ' GOOD')
                     elif r.status_code in range(400, 599):
-                        print(Fore.RED + url[0], r.status_code,' CLIENT/SERVER ISSUE')
+                        print(Fore.RED, url[0], r.status_code,' CLIENT/SERVER ISSUE')
                     elif r.status_code in range(300, 399):
-                        print(Fore.YELLOW + url[0], r.status_code, ' REDIRECT')
+                        print(Fore.YELLOW, url[0], r.status_code, ' REDIRECT')
                     else:
-                        print(Fore.WHITE + url[0], r.status_code, ' UNKNOWN')
+                        print(Fore.WHITE, url[0], r.status_code, ' UNKNOWN')
         except requests.exceptions.RequestException:
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
@@ -104,15 +102,15 @@ def ignoreURL(url):
                             ignore = True
                 else:
                     raise ValueError('\nInvalid file format for --ignore. Lines must start with "#", "http://", or "https://" only.')
-    except FileNotFoundError as e:             
+    except FileNotFoundError:             
         raise
     return ignore
             
 
 if args.version:
+    version = 0.3
     print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
 elif args.file or args.redirect:
-    foundUrls = []
     if args.json is not None:
         jsonArr = []
         print(Fore.YELLOW, ' ** JSON Object creation is slow ** \n',
