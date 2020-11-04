@@ -14,6 +14,7 @@ parser.add_argument('-j', '--json', help="Prints all urls in a json object on th
 parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)",nargs='*',metavar='')
 parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)",nargs='*',metavar='')
 parser.add_argument('-i','--ignore', help="Supply a text file with urls to ignore checking in the given file",metavar='')
+parser.add_argument('-t','--telescope',help="Runs link-check on the 10 most recent telescope posts",nargs='*',metavar='')
 
 args = parser.parse_args()
 
@@ -108,7 +109,7 @@ def ignoreURL(url):
             
 
 if args.version:
-    version = 0.3
+    version = 0.4
     print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
 elif args.file or args.redirect:
     if args.json is not None:
@@ -119,3 +120,29 @@ elif args.file or args.redirect:
         print(jsonArr)
     else:
         urlParse()
+elif args.telescope is not None:
+    r = requests.get('http://localhost:3000/posts', timeout=1.5)
+    if(r.status_code!=200):
+        print("Local telescope server does not respond with 200")
+    else:
+        jsonResponse = r.json()
+        for post in jsonResponse:
+            postRequest = requests.get('http://localhost:3000'+post["url"])
+            urls = re.findall(
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', str(postRequest.json()))
+            urls = list(dict.fromkeys(urls))
+            for url in urls:
+                if url[-1] == ",":
+                    url = url[:-2]
+                try:
+                    r = requests.get(url, timeout=1.5,allow_redirects=True)
+                    if r.status_code in range(200, 299):
+                        print(Fore.GREEN, url, r.status_code, ' GOOD')
+                    elif r.status_code in range(400, 599):
+                        print(Fore.RED, url, r.status_code,' CLIENT/SERVER ISSUE')
+                    elif r.status_code in range(300, 399):
+                        print(Fore.YELLOW, url, r.status_code, ' REDIRECT')
+                    else:
+                        print(Fore.WHITE, url, r.status_code, ' UNKNOWN')
+                except requests.exceptions.RequestException:
+                    print(Fore.RED + url, "TIMEOUT")
