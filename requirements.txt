@@ -1,3 +1,5 @@
 requests
 argparse
 colorama
+black
+flake8

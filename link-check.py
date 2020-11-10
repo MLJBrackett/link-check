@@ -2,19 +2,65 @@ import requests
 import re
 import argparse
 import sys
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 
 init()  # Colour support for Windows operating systems
 
-parser = argparse.ArgumentParser(description="link-check is a broken link identifier")
-parser.add_argument('-v', "--version", action='store_true', help="Returns the current version of tool")
-parser.add_argument('-f', '--file', help="Checks the given file in the current directory for urls (-f htmls.txt)", metavar='\b')
-parser.add_argument('-r', '--redirect', help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)", metavar="\b")
-parser.add_argument('-j', '--json', help="Prints all urls in a json object on the command line", nargs='*', metavar="")
-parser.add_argument('-g','--good', help="Prints only good urls (status = 200-299)",nargs='*',metavar='')
-parser.add_argument('-b','--bad', help="Prints only bad urls (status = 400-499)",nargs='*',metavar='')
-parser.add_argument('-i','--ignore', help="Supply a text file with urls to ignore checking in the given file",metavar='')
-parser.add_argument('-t','--telescope',help="Runs link-check on the 10 most recent telescope posts",nargs='*',metavar='')
+parser = argparse.ArgumentParser(
+    description="link-check is a broken link identifier"
+)
+parser.add_argument(
+    "-v",
+    "--version",
+    action="store_true",
+    help="Returns the current version of tool",
+)
+parser.add_argument(
+    "-f",
+    "--file",
+    help="Checks the given file in the current directory for urls (-f htmls.txt)",
+    metavar="\b",
+)
+parser.add_argument(
+    "-r",
+    "--redirect",
+    help="Checks the given file in the current directory for urls and allows for redirecting of urls (-r htmls.txt)",
+    metavar="\b",
+)
+parser.add_argument(
+    "-j",
+    "--json",
+    help="Prints all urls in a json object on the command line",
+    nargs="*",
+    metavar="",
+)
+parser.add_argument(
+    "-g",
+    "--good",
+    help="Prints only good urls (status = 200-299)",
+    nargs="*",
+    metavar="",
+)
+parser.add_argument(
+    "-b",
+    "--bad",
+    help="Prints only bad urls (status = 400-499)",
+    nargs="*",
+    metavar="",
+)
+parser.add_argument(
+    "-i",
+    "--ignore",
+    help="Supply a text file with urls to ignore checking in the given file",
+    metavar="",
+)
+parser.add_argument(
+    "-t",
+    "--telescope",
+    help="Runs link-check on the 10 most recent telescope posts",
+    nargs="*",
+    metavar="",
+)
 
 args = parser.parse_args()
 
@@ -22,6 +68,7 @@ args = parser.parse_args()
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     sys.exit(1)
+
 
 # Parses the URL from the given file
 def urlParse():
@@ -34,7 +81,9 @@ def urlParse():
         with open(argFile) or open(argFile) as file:
             for line in file:
                 urls = re.findall(
-                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
+                    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                    line,
+                )
                 if len(urls) != 0:
                     if args.ignore:
                         if not ignoreURL(urls):
@@ -42,8 +91,9 @@ def urlParse():
                     else:
                         foundUrls.append(urls)
     except Exception as e:
-        print(f'\n{e}')
+        print(f"\n{e}")
     urlCheck(foundUrls)
+
 
 # Returns the status code of the given URLs & prints corresponding message
 def urlCheck(foundUrls):
@@ -54,37 +104,45 @@ def urlCheck(foundUrls):
             elif args.redirect:
                 r = requests.head(url[0], timeout=1.5, allow_redirects=True)
             if args.json is not None:
-                    jsonObj = {
-                        "url": url,
-                        "status": r.status_code
-                    }
-                    if args.good is not None:
-                        if r.status_code in range(200,299):
-                            jsonArr.append(jsonObj)
-                    elif args.bad is not None:
-                        if r.status_code in range(400,599):
-                            jsonArr.append(jsonObj)
-                    else:
+                jsonObj = {"url": url, "status": r.status_code}
+                if args.good is not None:
+                    if r.status_code in range(200, 299):
                         jsonArr.append(jsonObj)
+                elif args.bad is not None:
+                    if r.status_code in range(400, 599):
+                        jsonArr.append(jsonObj)
+                else:
+                    jsonArr.append(jsonObj)
             else:
                 if args.good is not None:
-                    if r.status_code in range(200,299):
-                        print(Fore.GREEN, url[0],r.status_code,' GOOD')
+                    if r.status_code in range(200, 299):
+                        print(Fore.GREEN, url[0], r.status_code, " GOOD")
                 elif args.bad is not None:
-                    if r.status_code in range(400,599):
-                        print(Fore.RED, url[0],r.status_code,' CLIENT/SERVER ISSUE')
+                    if r.status_code in range(400, 599):
+                        print(
+                            Fore.RED,
+                            url[0],
+                            r.status_code,
+                            " CLIENT/SERVER ISSUE",
+                        )
                 else:
                     if r.status_code in range(200, 299):
-                        print(Fore.GREEN, url[0], r.status_code, ' GOOD')
+                        print(Fore.GREEN, url[0], r.status_code, " GOOD")
                     elif r.status_code in range(400, 599):
-                        print(Fore.RED, url[0], r.status_code,' CLIENT/SERVER ISSUE')
+                        print(
+                            Fore.RED,
+                            url[0],
+                            r.status_code,
+                            " CLIENT/SERVER ISSUE",
+                        )
                     elif r.status_code in range(300, 399):
-                        print(Fore.YELLOW, url[0], r.status_code, ' REDIRECT')
+                        print(Fore.YELLOW, url[0], r.status_code, " REDIRECT")
                     else:
-                        print(Fore.WHITE, url[0], r.status_code, ' UNKNOWN')
+                        print(Fore.WHITE, url[0], r.status_code, " UNKNOWN")
         except requests.exceptions.RequestException:
             print(Fore.RED + url[0], "TIMEOUT")
     print(Style.RESET_ALL)
+
 
 # Returns true if url is in the ignore list.
 def ignoreURL(url):
@@ -92,57 +150,76 @@ def ignoreURL(url):
     ignoreFile = args.ignore
     try:
         with open(ignoreFile) or open(ignoreFile) as file:
-            toIgnore = re.findall(r'^http[s]?://.*[^\s/]', file.read(), re.M)
+            toIgnore = re.findall(r"^http[s]?://.*[^\s/]", file.read(), re.M)
             file.seek(0)
             for line in file:
-                if re.match('#', line) or re.match('\n', line):
+                if re.match("#", line) or re.match("\n", line):
                     pass
-                elif re.match(r'^http[s]?://', line):
-                    for domain in toIgnore: 
-                        if re.match(f'{domain}', url[0]):    
+                elif re.match(r"^http[s]?://", line):
+                    for domain in toIgnore:
+                        if re.match(f"{domain}", url[0]):
                             ignore = True
                 else:
-                    raise ValueError('\nInvalid file format for --ignore. Lines must start with "#", "http://", or "https://" only.')
-    except FileNotFoundError:             
+                    raise ValueError(
+                        '\nInvalid file format for --ignore. Lines must start with "#", "http://", or "https://" only.'
+                    )
+    except FileNotFoundError:
         raise
     return ignore
-            
+
 
 if args.version:
     version = 0.4
-    print(Fore.GREEN+"Link"+Fore.RED+" Check", Style.RESET_ALL, "v.", version)
+    print(
+        Fore.GREEN + "Link" + Fore.RED + " Check",
+        Style.RESET_ALL,
+        "v.",
+        version,
+    )
 elif args.file or args.redirect:
     if args.json is not None:
         jsonArr = []
-        print(Fore.YELLOW, ' ** JSON Object creation is slow ** \n',
-              Fore.GREEN, '** JSON Object being created... **', Style.RESET_ALL)
+        print(
+            Fore.YELLOW,
+            " ** JSON Object creation is slow ** \n",
+            Fore.GREEN,
+            "** JSON Object being created... **",
+            Style.RESET_ALL,
+        )
         urlParse()
         print(jsonArr)
     else:
         urlParse()
 elif args.telescope is not None:
-    r = requests.get('http://localhost:3000/posts', timeout=1.5)
-    if(r.status_code!=200):
+    r = requests.get("http://localhost:3000/posts", timeout=1.5)
+    if r.status_code != 200:
         print("Local telescope server does not respond with 200")
     else:
         jsonResponse = r.json()
         for post in jsonResponse:
-            postRequest = requests.get('http://localhost:3000'+post["url"])
+            postRequest = requests.get("http://localhost:3000" + post["url"])
             urls = re.findall(
-                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', str(postRequest.json()))
+                r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                str(postRequest.json()),
+            )
             urls = list(dict.fromkeys(urls))
             for url in urls:
                 if url[-1] == ",":
                     url = url[:-2]
                 try:
-                    r = requests.get(url, timeout=1.5,allow_redirects=True)
+                    r = requests.get(url, timeout=1.5, allow_redirects=True)
                     if r.status_code in range(200, 299):
-                        print(Fore.GREEN, url, r.status_code, ' GOOD')
+                        print(Fore.GREEN, url, r.status_code, " GOOD")
                     elif r.status_code in range(400, 599):
-                        print(Fore.RED, url, r.status_code,' CLIENT/SERVER ISSUE')
+                        print(
+                            Fore.RED,
+                            url,
+                            r.status_code,
+                            " CLIENT/SERVER ISSUE",
+                        )
                     elif r.status_code in range(300, 399):
-                        print(Fore.YELLOW, url, r.status_code, ' REDIRECT')
+                        print(Fore.YELLOW, url, r.status_code, " REDIRECT")
                     else:
-                        print(Fore.WHITE, url, r.status_code, ' UNKNOWN')
+                        print(Fore.WHITE, url, r.status_code, " UNKNOWN")
                 except requests.exceptions.RequestException:
                     print(Fore.RED + url, "TIMEOUT")
