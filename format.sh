@@ -1,2 +1,2 @@
 #!/bin/bash
-black link-check.py
+black link_check.py

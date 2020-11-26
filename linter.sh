@@ -1,2 +1,2 @@
 #!/bin/bash
-flake link-check.py
+flake link_check.py

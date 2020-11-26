@@ -3,3 +3,4 @@ argparse
 colorama
 black
 flake8
+coverage
