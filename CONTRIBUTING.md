@@ -37,6 +37,20 @@ bash linter.sh
 
 The program has Visual Studio Code integration, saving the file with automatically run the linter on link-check.py
 
+## Testing & Coverage
+
+This program uses [unittest](https://docs.python.org/3/library/unittest.html)
+To run the testing file use:
+```bash
+python3 sample_test.py
+```
+The program uses [coverage](https://coverage.readthedocs.io/en/coverage-5.3/)
+To run the coverage report use:
+```bash
+coverage run sample_test.py
+coverage report
+```
+
 ## Contributing
 Prior to creating a pull request, make sure that the formatter and linter has run properly on your code, if you are using Visual Studio code it should automatically happen after you save.
 If you are using something else, you will have to run the above commands before submitting a pull request.
