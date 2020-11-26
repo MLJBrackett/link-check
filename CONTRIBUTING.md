@@ -39,12 +39,12 @@ The program has Visual Studio Code integration, saving the file with automatical
 
 ## Testing & Coverage
 
-This program uses [unittest](https://docs.python.org/3/library/unittest.html)
+This program uses [unittest](https://docs.python.org/3/library/unittest.html).
 To run the testing file use:
 ```bash
 python3 sample_test.py
 ```
-The program uses [coverage](https://coverage.readthedocs.io/en/coverage-5.3/)
+The program uses [coverage](https://coverage.readthedocs.io/en/coverage-5.3/).
 To run the coverage report use:
 ```bash
 coverage run sample_test.py
