@@ -1,5 +1,5 @@
 import unittest
-from link_check import requestUrl, checkUrl
+from link_check import requestUrl, checkUrl, parser
 from unittest.mock import patch
 
 
@@ -77,6 +77,16 @@ class TestUrlResponse(unittest.TestCase):
             requestUrl(singleUrlTimeout),
             "TIMEOUT",
             "Should be 'TIMEOUT'",
+        )
+
+
+class TestParser(unittest.TestCase):
+    def testArgs(self):
+        parserTest = str(parser.parse_args())
+        self.assertEqual(
+            parserTest,
+            "Namespace(bad=None, file=None, good=None, ignore=None, json=None, redirect=None, telescope=None, url=None, version=False)",
+            "Should be 'Namespace(bad=None, file=None, good=None, ignore=None, json=None, redirect=None, telescope=None, url=None, version=False)', if you have added more args, add tests for them! (And update this test)",
         )
 
 
