@@ -1,5 +1,5 @@
 import unittest
-from link_check import requestUrl, checkUrl, parser
+from link_check import requestUrl, checkUrl, parser, singleUrlCheck
 from unittest.mock import patch
 
 
@@ -36,6 +36,44 @@ class TestResponseOutput(unittest.TestCase):
             response = requestUrl(url)
         self.assertEqual(
             checkUrl(response, singleUrlRedirect),
+            "REDIRECT",
+            "Should be 'REDIRECT'",
+        )
+
+
+class TestURLOutput(unittest.TestCase):
+    @patch("link_check.requests.head")  # Mock 'requests' module 'get' method.
+    def test_url_good(self, mock_head):
+        singleUrlGood = ["https://mljbrackett.com"]
+        mock_head.return_value.status_code = 200
+        for url in singleUrlGood:
+            response = requestUrl(url)
+        self.assertEqual(
+            singleUrlCheck(response, singleUrlGood),
+            "GOOD",
+            "Should be 'GOOD'",
+        )
+
+    @patch("link_check.requests.head")  # Mock 'requests' module 'get' method.
+    def test_url_error(self, mock_head):
+        singleUrlError = ["https://mljbrackett.com/notarealroute"]
+        mock_head.return_value.status_code = 404
+        for url in singleUrlError:
+            response = requestUrl(url)
+        self.assertEqual(
+            singleUrlCheck(response, singleUrlError),
+            "CLIENT/SERVER ISSUE",
+            "Should be 'CLIENT/SERVER ISSUE'",
+        )
+
+    @patch("link_check.requests.head")  # Mock 'requests' module 'get' method.
+    def test_url_redirect(self, mock_head):
+        singleUrlRedirect = ["http://mljbrackett.com"]
+        mock_head.return_value.status_code = 300
+        for url in singleUrlRedirect:
+            response = requestUrl(url)
+        self.assertEqual(
+            singleUrlCheck(response, singleUrlRedirect),
             "REDIRECT",
             "Should be 'REDIRECT'",
         )
