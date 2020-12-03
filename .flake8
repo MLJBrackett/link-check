@@ -2,10 +2,8 @@
 ignore=E501
 exclude =
     CONTRIBUTING.md,
-    format.sh,
     htmls.txt,
     ignoreURL.txt,
     LICENSE,
     pyproject.toml,
     README.md,
-    requirements.txt
