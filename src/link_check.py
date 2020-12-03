@@ -69,6 +69,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+jsonArr = []
 
 
 # Prints the corresponding message for the status code
@@ -206,55 +207,64 @@ def ignoreURL(url):  # pragma: no cover
     return ignore
 
 
-if args.version:  # pragma: no cover
-    version = 0.5
-    print(
-        Fore.GREEN + "Link" + Fore.RED + " Check",
-        Style.RESET_ALL,
-        "v.",
-        version,
-    )
-elif args.file or args.redirect:  # pragma: no cover
-    if args.json is not None:
-        jsonArr = []
+def main_wrapper():
+    if args.version:  # pragma: no cover
+        version = 0.5
         print(
-            Fore.YELLOW,
-            " ** JSON Object creation is slow ** \n",
-            Fore.GREEN,
-            "** JSON Object being created... **",
+            Fore.GREEN + "Link" + Fore.RED + " Check",
             Style.RESET_ALL,
+            "v.",
+            version,
         )
-        foundUrls = urlParse()
-        for url in foundUrls:
-            status_code = requestUrl(url)
-            checkUrl(status_code, url)
-        print(jsonArr)
-    else:
-        foundUrls = urlParse()
-        for url in foundUrls:
-            status_code = requestUrl(url)
-            checkUrl(status_code, url)
-elif args.telescope is not None:  # pragma: no cover
-    r = requests.get("http://localhost:3000/posts", timeout=1.5)
-    if r.status_code != 200:
-        print("Local telescope server does not respond with 200")
-    else:
-        jsonResponse = r.json()
-        for post in jsonResponse:
-            postRequest = requests.get("http://localhost:3000" + post["url"])
-            urls = re.findall(
-                r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
-                str(postRequest.json()),
+    elif args.file or args.redirect:  # pragma: no cover
+        if args.json is not None:
+
+            print(
+                Fore.YELLOW,
+                " ** JSON Object creation is slow ** \n",
+                Fore.GREEN,
+                "** JSON Object being created... **",
+                Style.RESET_ALL,
             )
-            urls = list(dict.fromkeys(urls))
-            for url in urls:
-                if url[-1] == ",":
-                    url = url[:-2]
-                try:
-                    r = requests.get(url, timeout=1.5, allow_redirects=True)
-                    checkUrl(r.status_code, url)
-                except requests.exceptions.RequestException:
-                    print(Fore.RED + url, "TIMEOUT")
-elif args.url is not None:  # pragma: no cover
-    status_code = requestUrl(args.url)
-    singleUrlCheck(status_code, args.url)
+            foundUrls = urlParse()
+            for url in foundUrls:
+                status_code = requestUrl(url)
+                checkUrl(status_code, url)
+            print(jsonArr)
+        else:
+            foundUrls = urlParse()
+            for url in foundUrls:
+                status_code = requestUrl(url)
+                checkUrl(status_code, url)
+    elif args.telescope is not None:  # pragma: no cover
+        r = requests.get("http://localhost:3000/posts", timeout=1.5)
+        if r.status_code != 200:
+            print("Local telescope server does not respond with 200")
+        else:
+            jsonResponse = r.json()
+            for post in jsonResponse:
+                postRequest = requests.get(
+                    "http://localhost:3000" + post["url"]
+                )
+                urls = re.findall(
+                    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                    str(postRequest.json()),
+                )
+                urls = list(dict.fromkeys(urls))
+                for url in urls:
+                    if url[-1] == ",":
+                        url = url[:-2]
+                    try:
+                        r = requests.get(
+                            url, timeout=1.5, allow_redirects=True
+                        )
+                        checkUrl(r.status_code, url)
+                    except requests.exceptions.RequestException:
+                        print(Fore.RED + url, "TIMEOUT")
+    elif args.url is not None:  # pragma: no cover
+        status_code = requestUrl(args.url)
+        singleUrlCheck(status_code, args.url)
+
+
+if __name__ == "__main__":
+    main_wrapper()
