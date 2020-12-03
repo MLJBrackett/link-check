@@ -20,20 +20,12 @@ pip install -r requirements.txt
 ## Formatting
 
 This program uses [Python Black](https://pypi.org/project/black/) as the Source Code Formatter.
-To run the formatter before you create a pull request use:
-```bash
-bash format.sh
-```
 
 The program has Visual Studio Code integration, saving the file with automatically run the formatter on link-check.py
 
 ## Linting
 
 This program uses [Flake8](https://flake8.pycqa.org/en/latest/index.html) as the Linter.
-To run the Linter before you create a pull request use:
-```bash
-bash linter.sh
-```
 
 The program has Visual Studio Code integration, saving the file with automatically run the linter on link-check.py
 

@@ -4,7 +4,7 @@ with open("docs/README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="linkcheck-pkg-MLJBrackett",  # Replace with your own username
+    name="linkcheck-pkg-MLJBrackett",
     version="1.1",
     author="Michael Brackett",
     author_email="mljbrackett@gmail.com",
