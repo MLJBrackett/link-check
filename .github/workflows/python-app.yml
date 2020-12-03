@@ -26,4 +26,4 @@ jobs:
         pip install unittest2
     - name: Test with unittest
       run: |
-        python3 unittest2
+        python3 -m unittest2
